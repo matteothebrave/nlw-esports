@@ -1,0 +1,2 @@
+** // Installed npm i ts-node-dev -D (Only for dev dependencies). 
+Use: This is used for run a live backend server refreshed automatically without the issue of reseting the server to put or edit infos. ** 
