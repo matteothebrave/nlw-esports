@@ -1,2 +1,31 @@
-** // Installed npm i ts-node-dev -D (Only for dev dependencies). 
-Use: This is used for run a live backend server refreshed automatically without the issue of reseting the server to put or edit infos. ** 
+# BackEnd
+# Entidades
+
+### Game
+id
+title
+bannerUrl 
+
+#### Ad
+id
+gameId
+name
+yearsPlaying
+discord
+weekDays
+hourStart
+hourEnd
+useVoiceChannel
+createdAt
+
+
+## Casos de uso
+
+Listagem de Games com contagem de anuncios
+Criacao de novo anuncio 
+Listagem de anuncios por game
+Buscar discord pelo ID do anuncio
+
+LIBS - FW
+-> SQLite for DB
+-> Prisma for ORM (npm i -D prisma  -- npx prisma init --datasource-provider SQlite) npx prisma studio 
