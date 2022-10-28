@@ -1,30 +1,33 @@
-import express from 'express'
-import { PrismaClient } from '@prisma/client'
-import { convertHourStringToMinutes } from './utils/convert-hour-string-to-minutes'
+import express from "express";
+import cors from "cors";
 
-const prisma = new PrismaClient()
+import { PrismaClient } from '@prisma/client';
+import { convertHourStringToMinutes } from "./utils/convert-hour-string-to-minutes";
+import { convertMinutesToHourString } from "./utils/convert-minutes-to-hour-string";
+
 const app = express()
-app.use(express.json())
 
+app.use(express.json());
+app.use(cors());
 
-
+const prisma = new PrismaClient({
+  log: ['query'],
+});
 
 app.get('/games', async (request, response) => {
-  // procura todos
   const games = await prisma.game.findMany({
-    // faz o join
     include: {
-      // agregate
       _count: {
-        // relacionamento de ads
         select: {
           ads: true,
         }
       }
     }
-  })
+  });
+
   return response.json(games);
-})
+});
+
 app.post('/games/:id/ads', async (request, response) => {
   const gameId = request.params.id;
   const body: any = request.body;
@@ -39,15 +42,15 @@ app.post('/games/:id/ads', async (request, response) => {
       hourStart: convertHourStringToMinutes(body.hourStart),
       hourEnd: convertHourStringToMinutes(body.hourEnd),
       useVoiceChannel: body.useVoiceChannel,
-    }
+    },
   })
 
-  // status 201 (CREATED/SUCCESS)
   return response.status(201).json(ad);
-})
-// localhost:333/ads
+});
+
 app.get('/games/:id/ads', async (request, response) => {
   const gameId = request.params.id;
+
   const ads = await prisma.ad.findMany({
     select: {
       id: true,
@@ -66,13 +69,15 @@ app.get('/games/:id/ads', async (request, response) => {
     }
   })
 
-  return response.status(200).json(ads.map(ad => {
+  return response.json(ads.map(ad => {
     return {
       ...ad,
-      weekDays: ad.weekDays.split(',')
+      weekDays: ad.weekDays.split(','),
+      hourStart: convertMinutesToHourString(ad.hourStart),
+      hourEnd: convertMinutesToHourString(ad.hourEnd),
     }
-  }))
-})
+  }));
+});
 
 app.get('/ads/:id/discord', async (request, response) => {
   const adId = request.params.id;
@@ -84,12 +89,13 @@ app.get('/ads/:id/discord', async (request, response) => {
     where: {
       id: adId,
     }
-  })
+  });
 
   return response.json({
     discord: ad.discord,
   })
-})
+});
 
-// para ouvir a porta no (localhost:3333)
-app.listen(3333)
+app.listen(3333, () => {
+  console.log('app running port 3333')
+})
